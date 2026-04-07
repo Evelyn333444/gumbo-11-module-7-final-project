@@ -30,6 +30,28 @@
   }
 }
 
+#itemList {
+  list-style: none;
+  padding: 0;
+}
+#itemList li {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
+#dateSorter {
+  margin-bottom: 20px;
+  padding: 5px;
+}
+
+  footer {
+    background-color: #000000; 
+    color: #ffffff;           
+    text-align: center;      
+    padding: 20px 0;         
+    width: 100%;             
+  }
+
+
 @media (prefers-color-scheme: dark) {
   :root {
     --text: #9ca3af;
