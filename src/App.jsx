@@ -17,7 +17,7 @@ const App = () => {
     }, []);
     return (
         <div className="app">
-            <h1>GeeksforGeeks's Movie Center</h1>
+            <h1> Movie Center</h1>
 
             <div className="search">
                 <input
@@ -74,31 +74,72 @@ async function getMovieData() {
   }
 }
 
-getMovieData();
+const API_KEY = 'd3102f89'; // Your OMDb API key
+const searchForm = document.getElementById('search-form');
+const searchInput = document.getElementById('search-input');
+const movieContainer = document.getElementById('movie-container');
+const filter = document.querySelector('#filter')
 
-const items = [
-  { name: "Event A", date: "2023-05-10" },
-  { name: "Event B", date: "2021-12-01" },
-  { name: "Event C", date: "2024-01-15" }
-];
+let currentMovies= []
 
-const sorter = document.getElementById('dateSorter');
-const list = document.getElementById('itemList');
-
-function renderList(data) {
-  list.innerHTML = data.map(item => `<li>${item.name} - ${item.date}</li>`).join('');
-}
-
-sorter.addEventListener('change', (e) => {
-  const sorted = [...items].sort((a, b) => {
-    const dateA = new Date(a.date);
-    const dateB = new Date(b.date);
-    return e.target.value === 'asc' ? dateA - dateB : dateB - dateA;
-  });
-  renderList(sorted);
+searchForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const searchTerm = searchInput.value;
+    if (searchTerm) {
+        searchMovies(searchTerm);
+    }
 });
 
-// Initial render
-renderList(items);
+async function searchMovies(query) {
+    // Note: OMDb API requires a single movie search parameter ('t') or a search term ('s')
+    // When using 's' for search, the response structure is different (results are in a "Search" array)
+    const url = `https://www.omdbapi.com/?s=${query}&apikey=${API_KEY}`;
+    
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    if (data.Search) {
+        currentMovies = data.Search;
+        filter.value = '';
+        displayMovies(currentMovies);
+    } else {
+        movieContainer.innerHTML = '<p>No movies found.</p>';
+        currentMovies = [];
+    }
+}
+
+function displayMovies(movies) {
+    movieContainer.innerHTML = '';
+    movies.forEach(movie => {
+        const movieCard = document.createElement('div');
+        movieCard.classList.add('movie-card');
+
+        movieCard.innerHTML = `
+            <img src="${movie.Poster !== 'N/A' ? movie.Poster : 'https://placeholder.com'}" alt="${movie.Title} Poster">
+            <div class="movie-info">
+                <h2>${movie.Title}</h2>
+                <p>${movie.Year}</p>
+            </div>
+        `;
+
+        movieContainer.appendChild(movieCard);
+    });
+}
+filter.addEventListener('change', (e) => {
+    renderMovies(e.target.value)
+})
+
+function renderMovies(sortType) {
+    let sortedMovies = [...currentMovies]; //copy so original is preserved
+
+    if (sortType === 'NEW_TO_OLD') {
+        sortedMovies.sort((a,b) => Number(b.Year)- Number(a.year));
+    }
+    else if (sortType === 'OLD_TO_NEW') {
+        sortedMovies.sort((a,b) => Number(a.Year) - Number(b.Year));
+    }
+
+    displayMovies(sortedMovies);
+}
 
 export default App;
