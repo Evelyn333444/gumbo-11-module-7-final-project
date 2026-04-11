@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import MovieCard from './components/MovieCard';
+import MovieModal from './components/MovieModal';
 
 const API_URL = 'https://omdbapi.com/?apikey=fe2f6c44';
 
@@ -8,6 +9,8 @@ const App = () => {
     const [movies, setMovies] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortType, setSortType] = useState('');
+    const [viewModal, setViewModal] = useState(false)
+    const [movie, setMovie] = useState({})
 
     const searchMovies = async (title) => {
         const response = await fetch(`${API_URL}&s=${title}`);
@@ -15,7 +18,7 @@ const App = () => {
         setMovies(data.Search);
     }
 
-    
+
 
     const sortedMovies = [...movies];
     if (sortType === 'NEW_TO_OLD') {
@@ -52,7 +55,10 @@ const App = () => {
             {sortedMovies?.length > 0 ? (
                 <div className="container">
                     {sortedMovies.map((movie) => (
-                        <MovieCard movie={movie} key={movie.imdbID} />
+                        <MovieCard movie={movie} key={movie.imdbID} onClick={() => {
+                            setMovie(movie)
+                            setViewModal(true)
+                        }} />
                     ))}
                 </div>
             ) : (
@@ -60,9 +66,10 @@ const App = () => {
                     <h2>No Movies found</h2>
                 </div>
             )}
+            {viewModal && (<MovieModal movie={movie} onClose={()=> setViewModal(false)} />)}
         </div>
+//Lines 55-70 are showing how to put the modal in action on the website.
 
-        
     );
 }
 
