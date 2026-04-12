@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import MovieCard from './components/MovieCard';
 import MovieModal from './components/MovieModal';
+import Sort from './components/Sort';
+
 
 const API_URL = 'https://omdbapi.com/?apikey=fe2f6c44';
 
@@ -16,15 +18,7 @@ const App = () => {
         const response = await fetch(`${API_URL}&s=${title}`);
         const data = await response.json();
         setMovies(data.Search);
-    }
-
-
-
-    const sortedMovies = [...movies];
-    if (sortType === 'NEW_TO_OLD') {
-        sortedMovies.sort((a, b) => Number(b.Year) - Number(a.Year));
-    } else if (sortType === 'OLD_TO_NEW') {
-        sortedMovies.sort((a, b) => Number(a.Year) - Number(b.Year));
+        setMovies(data.Search.length > 0 ? data.Search : [])
     }
 
     return (
@@ -42,14 +36,6 @@ const App = () => {
                     alt="search icon"
                     onClick={() => searchMovies(searchTerm)}
                 />
-            </div>
-
-            <div className="filter-container">
-                <select value={sortType} onChange={(e) => setSortType(e.target.value)}>
-                    <option value="">Sort by...</option>
-                    <option value="NEW_TO_OLD">Newest to Oldest</option>
-                    <option value="OLD_TO_NEW">Oldest to Newest</option>
-                </select>
             </div>
 
             {sortedMovies?.length > 0 ? (
